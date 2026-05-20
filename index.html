@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>岭南非遗：英歌舞探索古卷</title>
+    <style>
+        :root {
+            --bg-color: #f4ebd0; 
+            --primary-color: #4a2512; 
+            --accent-color: #b84323; 
+            --text-color: #2c1a0c; 
+            --gold-color: #cc9933; 
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.5) 0%, rgba(0,0,0,0.08) 100%),
+                url('data:image/svg+xml;utf8,<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg"><filter id="paper-noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23paper-noise)" opacity="0.07"/></svg>');
+            font-family: "STZhongsong", "SimSun", "KaiTi", serif;
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            position: relative;
+        }
+        header::after {
+            content: ''; display: block; width: 60px; height: 3px; background: var(--gold-color); margin: 20px auto 0; opacity: 0.6;
+        }
+
+        .seal-stamp {
+            position: absolute; top: 25px; left: 5%; width: 55px; height: 55px;
+            border: 3px solid var(--accent-color); border-radius: 4px;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+            color: var(--accent-color); font-family: "KaiTi"; font-weight: bold; font-size: 1.1rem;
+            line-height: 1.1; padding: 2px; transform: rotate(-8deg); opacity: 0.85;
+            box-shadow: inset 0 0 4px rgba(184, 67, 35, 0.4);
+            filter: url(#seal-erosion);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 3rem); color: var(--primary-color); margin: 0; letter-spacing: 8px; font-weight: 900;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+        }
+        .subtitle {
+            font-size: clamp(0.9rem, 3vw, 1.15rem); color: var(--accent-color); margin-top: 10px; font-weight: bold; letter-spacing: 3px;
+        }
+
+        .nav-buttons {
+            margin-top: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 0 10px;
+        }
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(74, 37, 18, 0.4); color: var(--primary-color);
+            padding: 8px 24px; font-size: 1.05rem; font-family: inherit; font-weight: bold; cursor: pointer;
+            border-radius: 30px; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .nav-btn:hover { border-color: var(--primary-color); transform: translateY(-2px); background: rgba(255, 255, 255, 0.7); }
+        .nav-btn.active {
+            background: var(--primary-color); color: var(--bg-color); border-color: var(--primary-color); box-shadow: 0 5px 15px rgba(74, 37, 18, 0.3);
+        }.audio-control {
+            position: fixed; top: 20px; right: 20px; z-index: 200;
+            background: linear-gradient(135deg, #ebd5a9, #d4b886); border: 2px solid var(--primary-color);
+            border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;
+        }
+        .audio-control:hover { transform: scale(1.1); }
+        .rotating { animation: rotate 5s linear infinite; border-color: var(--accent-color); }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        .container { max-width: 1100px; margin: 10px auto 60px; position: relative; padding: 0 20px; }
+
+        .map-wrapper {
+            position: relative; width: 100%; height: 550px;
+            background: linear-gradient(to right, #cf9b62 0%, #ecd3a5 6%, #ecd3a5 94%, #cf9b62 100%);
+            border-top: 4px solid #7c4c24; border-bottom: 4px solid #7c4c24;
+            box-shadow: inset 0 0 60px rgba(74, 37, 18, 0.5), 0 20px 40px rgba(0,0,0,0.25);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .map-wrapper::before, .map-wrapper::after {
+            content: ''; position: absolute; top: -18px; bottom: -18px; width: 24px;
+            background: linear-gradient(to right, #2c1407, #5c3014, #2c1407); border-radius: 12px;
+            box-shadow: 5px 10px 20px rgba(0,0,0,0.4), inset 0 0 5px rgba(0,0,0,0.8); z-index: 5;
+        }
+        .map-wrapper::before { left: -12px; } 
+        .map-wrapper::after { right: -12px; box-shadow: -5px 10px 20px rgba(0,0,0,0.4), inset 0 0 5px rgba(0,0,0,0.8); }
+
+        .map-river {
+            position: absolute; width: 100%; height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg"><path d="M0,350 Q250,220 450,420 T900,280 T1000,400" fill="none" stroke="rgba(74, 37, 18, 0.12)" stroke-width="45" stroke-linecap="round"/><path d="M150,500 C300,420 250,250 500,200 S750,150 900,50" fill="none" stroke="rgba(74, 37, 18, 0.06)" stroke-width="2" stroke-dasharray="10,10"/><path d="M100,250 C250,230 350,120 550,180 S800,280 950,200" fill="none" stroke="rgba(184, 67, 35, 0.05)" stroke-width="3"/><circle cx="350" cy="180" r="120" fill="rgba(74,37,18,0.01)" stroke="rgba(74,37,18,0.03)" stroke-width="1"/></svg>');
+            background-size: cover; background-position: center; pointer-events: none;
+        }
+        .map-bg-text {
+            position: absolute; font-size: clamp(5rem, 12vw, 8.5rem); color: rgba(74, 37, 18, 0.035); font-weight: bold;
+            font-family: "STXingkai", serif; letter-spacing: 25px; writing-mode: vertical-rl; user-select: none; top: 10%;
+        }
+        
+        .node { position: absolute; display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 10; }
+        .node:hover .pin, .node:active .pin { transform: scale(1.25); background: var(--accent-color); border-color: #fff; }
+        .pin {
+            width: 16px; height: 16px; background: var(--primary-color); border-radius: 50%;
+            border: 2px solid var(--gold-color); box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; animation: pulse-ring 2.5s infinite;
+        }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(184, 67, 35, 0.6); } 70% { box-shadow: 0 0 0 15px rgba(184, 67, 35, 0); } 100% { box-shadow: 0 0 0 0 rgba(184, 67, 35, 0); } }
+        .node-label {
+            margin-top: 10px; background: rgba(255, 255, 255, 0.92); padding: 4px 12px; border-radius: 20px;
+            font-size: 0.9rem; font-weight: bold; color: var(--primary-color); border: 1px solid rgba(74, 37, 18, 0.4); box-shadow: 0 2px 6px rgba(0,0,0,0.12); transition: all 0.3s;
+        }
+        .node:hover .node-label { background: var(--primary-color); color: #fff; }
+        
+        #node-puning { top: 35%; left: 28%; } #node-chaoyang { top: 48%; left: 52%; } #node-jiazi { top: 70%; left: 76%; }
+        #node-shenquan { top: 66%; left: 40%; } #node-zhangzhou { top: 22%; left: 66%; }
+
+        .content-section {
+            display: none; padding: 45px; background: rgba(255,255,255,0.65); border: 1px solid rgba(139, 107, 74, 0.35); border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.04); font-size: 1.1rem; animation: fadeIn 0.5s ease-out forwards;
+            position: relative;
+        }
+        .content-section::before {
+            content: ''; position: absolute; top: 10px; left: 10px; width: 20px; height: 20px;
+            border-top: 2px solid var(--gold-color); border-left: 2px solid var(--gold-color); opacity: 0.4;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .active-section { display: block; }
+
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 25px; margin-top: 25px; }
+        .media-card {
+            background: #fff; border: 1px solid #dfcba9; border-radius: 12px; padding: 12px; text-align: center;
+            display: flex; flex-direction: column; justify-content: space-between; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04); position: relative; overflow: hidden;
+        }
+        .media-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-color); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+        }
+        .media-card:hover { transform: translateY(-6px); box-shadow: 0 18px 35px rgba(74, 37, 18, 0.12); border-color: transparent; }
+        .media-card:hover::before { transform: scaleX(1); }
+        .media-title { font-size: 1.05rem; color: var(--primary-color); margin: 8px 0 15px; font-weight: bold; line-height: 1.4; }
+
+        .team-card { 
+            background: rgba(255, 255, 255, 0.75); border: 2px dashed var(--gold-color); border-radius: 15px; padding: 40px; max-width: 720px; margin: 0 auto; position: relative; 
+        }
+        .team-card::after { 
+            content: '非遗\n传承'; white-space: pre; position: absolute; bottom: 20px; right: 30px;
+            font-size: 0.9rem; color: rgba(184, 67, 35, 0.25); border: 2px solid rgba(184, 67, 35, 0.25); 
+            border-radius: 3px; padding: 4px 6px; font-family: "KaiTi"; font-weight: bold; transform: rotate(12deg); line-height: 1.2;
+        }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 12, 7, 0.82); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: var(--bg-color); width: 100%; max-width: 520px; padding: 40px 30px; border-radius: 10px; border: 2px solid var(--gold-color); position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.6); animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+        .close-btn { position: absolute; top: 12px; right: 18px; font-size: 2rem; cursor: pointer; color: var(--primary-color); transition: color 0.3s; }
+        .close-btn:hover { color: var(--accent-color); }
+        .modal-title { color: var(--accent-color); border-bottom: 1px dashed var(--primary-color); padding-bottom: 12px; font-size: 1.7rem; margin-top: 0; text-align: center; letter-spacing: 2px; }
+        
+        ul { padding-left: 20px; } li { margin-bottom: 12px; } strong { color: var(--accent-color); }
+
+      /* ================= 敦煌之美同款：深色沉浸交互展厅样式 ================= */
+    .epic-dark-section {
+        background: linear-gradient(135deg, #07111b 0%, #03060a 100%); /* 藏青高冷底色 */
+        border-radius: 16px;
+        padding: 60px 40px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(216, 176, 104, 0.25); /* 鎏金质感细框 */
+    }
+
+    /* 敦煌金色流光微光，带有些许呼吸感 */
+    .epic-dark-section::before {
+        content: ''; position: absolute; top: -10%; left: -10%; width: 60%; height: 60%;
+        background: radial-gradient(circle, rgba(216, 176, 104, 0.15) 0%, transparent 70%);
+        filter: blur(50px); pointer-events: none;
+    }
+
+    /* 左侧：电影感大画幅数字流光展位 */
+    .epic-carousel {
+        width: 45%;
+        height: 520px;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(216, 176, 104, 0.2);
+        border: 2px solid rgba(216, 176, 104, 0.7);
+        z-index: 2;
+        background: #080d13;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .epic-carousel .digital-art-container {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0;
+        transition: opacity 1.2s ease-in-out;
+        animation: epic-fade-smooth 10s infinite ease-in-out;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    
+    .epic-carousel .digital-art-container:nth-child(1) { animation-delay: 0s; }
+    .epic-carousel .digital-art-container:nth-child(2) { animation-delay: 5s; }
+
+    @keyframes epic-fade-smooth {
+        0%, 40% { opacity: 1; transform: scale(1.05); } 
+        48%, 92% { opacity: 0; transform: scale(1); }   
+        100% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* 右侧：排版文本区 */
+    .epic-content {
+        width: 55%; position: relative; z-index: 2;
+    }
+
+    /* 敦煌大厂毕设原版：超大艺术字水印 */
+    .epic-watermark {
+        position: absolute; top: -65px; left: -20px;
+        font-size: 120px; font-family: 'Times New Roman', serif; font-weight: 900;
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(216, 176, 104, 0.08);
+        text-shadow: 0 0 40px rgba(216, 176, 104, 0.03);
+        z-index: -1; user-select: none;
+    }
+
+    .epic-title {
+        font-size: 34px; color: #d8b068; 
+        font-family: "Noto Serif SC", serif; letter-spacing: 4px; font-weight: bold;
+        margin-bottom: 35px; text-shadow: 0 0 15px rgba(216, 176, 104, 0.3);
+    }
+    
+    .epic-title::after {
+        content: ''; display: block; width: 60px; height: 2px;
+        background: #d8b068; margin-top: 15px;
+    }
+
+    /* 悬浮交互式星空微光卡片 */
+    .epic-card {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(216, 176, 104, 0.15);
+        border-left: 4px solid #d8b068;
+        padding: 25px; border-radius: 4px; margin-bottom: 25px;
+        transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background 0.3s;
+    }
+    
+    /* 鼠标悬停：3D物理浮动回馈 */
+    .epic-card:hover {
+        transform: translateY(-5px) translateX(5px);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(216, 176, 104, 0.4);
+        border-left: 4px solid #e6c887;
+        box-shadow: -5px 15px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .epic-card h3 {
+        color: #e6c887; font-size: 20px; margin-top: 0; margin-bottom: 12px; letter-spacing: 2px;
+        font-family: "Noto Serif SC", serif;
+    }
+
+    .epic-card p {
+        color: #a9bccc; font-size: 15px; line-height: 2; margin: 0; text-align: justify;
+    }
+
+    .epic-tags { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .e-tag { padding: 4px 12px; border-radius: 2px; font-size: 13px; font-weight: bold; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+
+    @media (max-width: 900px) {
+        .epic-dark-section { flex-direction: column; padding: 30px 20px; gap: 35px; }
+        .epic-carousel { width: 100%; height: 380px; }
+        .epic-content { width: 100%; }
+        .epic-watermark { font-size: 80px; top: -45px; }
+    }
+    </style>
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="seal-erosion">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+    </svg>
+<style>
+        .epic-dark-section {
+            background: linear-gradient(135deg, #0a1118 0%, #05080c 100%);
+            border-radius: 16px;
+            padding: 60px 40px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(216, 176, 104, 0.25);
+        }
+
+        .epic-dark-section::before {
+            content: ''; position: absolute; top: -10%; left: -10%; width: 60%; height: 60%;
+            background: radial-gradient(circle, rgba(216, 176, 104, 0.12) 0%, transparent 70%);
+            filter: blur(50px); pointer-events: none;
+        }
+
+        .epic-carousel {
+            width: 45%;
+            height: 520px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(216, 176, 104, 0.2);
+            border: 2px solid rgba(216, 176, 104, 0.7);
+            z-index: 2;
+            background: #080d13;
+        }
+
+        .epic-carousel img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1);
+            transition: opacity 1.2s ease-in-out;
+            animation: epic-fade-smooth 10s infinite ease-in-out;
+        }
+        
+        .epic-carousel img:nth-child(1) { animation-delay: 0s; }
+        .epic-carousel img:nth-child(2) { animation-delay: 5s; }
+
+        @keyframes epic-fade-smooth {
+            0%, 40% { opacity: 1; transform: scale(1.05); }
+            48%, 92% { opacity: 0; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .epic-content {
+            width: 55%; position: relative; z-index: 2;
+        }
+
+        .epic-watermark {
+            position: absolute; top: -65px; left: -20px;
+            font-size: 120px; font-family: 'Times New Roman', serif; font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(216, 176, 104, 0.08);
+            text-shadow: 0 0 40px rgba(216, 176, 104, 0.03);
+            z-index: -1; user-select: none;
+        }
+
+        .epic-title {
+            font-size: 34px; color: #d8b068;
+            font-family: "Noto Serif SC", serif; letter-spacing: 4px; font-weight: bold;
+            margin-bottom: 35px; text-shadow: 0 0 15px rgba(216, 176, 104, 0.3);
+        }
+        
+        .epic-title::after {
+            content: ''; display: block; width: 60px; height: 2px;
+            background: #d8b068; margin-top: 15px;
+        }
+
+        .epic-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(216, 176, 104, 0.15);
+            border-left: 4px solid #d8b068;
+            padding: 25px; border-radius: 4px; margin-bottom: 25px;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background 0.3s;
+        }
+        
+        .epic-card:hover {
+            transform: translateY(-5px) translateX(5px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(216, 176, 104, 0.4);
+            border-left: 4px solid #e6c887;
+            box-shadow: -5px 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .epic-card h3 {
+            color: #e6c887; font-size: 20px; margin-top: 0; margin-bottom: 12px; letter-spacing: 2px;
+            font-family: "Noto Serif SC", serif;
+        }
+
+        .epic-card p {
+            color: #a9bccc; font-size: 15px; line-height: 2; margin: 0; text-align: justify;
+        }
+
+        .epic-tags { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .e-tag { padding: 4px 12px; border-radius: 2px; font-size: 13px; font-weight: bold; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+
+        @media (max-width: 900px) {
+            .epic-dark-section { flex-direction: column; padding: 30px 20px; gap: 35px; }
+            .epic-carousel { width: 100%; height: 380px; }
+            .epic-content { width: 100%; }
+            .epic-watermark { font-size: 80px; top: -45px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop preload="auto" crossorigin="anonymous">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Guzheng_-_High_Mountain_and_Flowing_Water.ogg" type="audio/ogg">
+    </audio>
+
+    <div class="audio-control" id="musicBtn" onclick="toggleMusic()" title="击鼓抚琴">
+        <span class="audio-icon" id="musicIcon">🔇</span>
+    </div>
+
+    <header>
+        <div class="seal-stamp">英歌<br>非遗</div>
+        <h1>英歌舞探索古卷</h1>
+        <div class="subtitle">【 岭南非遗文化通识 · 英雄豪情赞歌 】</div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="switchTab('history')">📜 源流考究</button>
+            <button class="nav-btn active" onclick="switchTab('map')">🗺️ 派系图录</button>
+            <button class="nav-btn" onclick="switchTab('media')">🎥 影像大赏</button>
+            <button class="nav-btn" onclick="switchTab('props')">🎭 道具妆造</button>
+            <button class="nav-btn" onclick="switchTab('course')">🎓 实践通识</button>
+            <button class="nav-btn" onclick="switchTab('team')">✍️ 团队落款</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="history" class="content-section">
+            <h2 style="color:var(--primary-color); text-align:center; margin-bottom: 25px;">起源众说纷纭</h2>
+            <p>英歌舞（Yingge Dance）是一种糅合南派武术、戏曲等地方艺术的民间广场舞蹈。其源流主要有以下几种考究：</p >
+            <ul>
+                <li><strong>水浒说（主流共识）：</strong>源于水浒戏曲，相传汉戏南下潮汕普宁出演《攻打大名府》，深得百姓喜爱，人们开始学习这种戏曲舞蹈，意为崇拜英雄的赞歌。</li>
+                <li><strong>傩文化说：</strong>从古时驱鬼逐疫的民间祭祀舞蹈变化而来，其脸谱设计与道具（如“手蛇”）都存在大量的傩舞元素遗存。</li>
+                <li><strong>练武说：</strong>明末清初时，农民为了能避人耳目，闭门练武，将这种带有武术性质的民间舞蹈发挥至极致。</li>
+                <li><strong>畲族说：</strong>古时畲民唱的秧歌与湖南花鼓戏结合，最终合流为潮汕乡土艺术。</li>
+            </ul>
+        </div>
+
+        <div id="map" class="content-section active-section" style="padding:0; border:none; background:transparent; box-shadow:none;">
+            <div class="map-wrapper">
+                <div class="map-river"></div>
+                <div class="map-bg-text">潮汕地理</div>
+                
+                <div class="node" id="node-puning" onclick="openModal('普宁英歌', '壮美阳刚的汉族男性群体舞蹈，主要表现梁山泊英雄攻打大名府的豪情斗志和英雄气概。动作套式五花八门，有布田、洗街、旋槌等，场面恢宏，气势磅礴。')">
+                    <div class="pin"></div><div class="node-label">普宁</div>
+                </div>
+                <div class="node" id="node-chaoyang" onclick="openModal('潮阳英歌', '以豪放、遒劲闻名遐迩，被誉为“中国汉族男子汉典型舞蹈”。将南派武术、潮剧、潮汕民间舞蹈融为一体，在祈福迎祥中独具美感。')">
+                    <div class="pin"></div><div class="node-label">潮阳</div>
+                </div>
+                <div class="node" id="node-jiazi" onclick="openModal('甲子英歌', '流传于汕尾陆丰，被誉为“武当一叶”。完整队列有107个好汉（比梁山108将少1人），由“李逵”“杨志”等领队。步伐沉稳，气势磅礴。')">
+                    <div class="pin"></div><div class="node-label">甲子</div>
+                </div>
+                <div class="node" id="node-shenquan" onclick="openModal('神泉英歌', '风格威猛、粗犷。头槌多为李逵或秦明，二槌为关胜 or 杨志，手舞布蛇的“时迁”充当队伍前导。身穿武士服紧身短打，勾画风格独特的戏剧脸谱。')">
+                    <div class="pin"></div><div class="node-label">神泉</div>
+                </div>
+                <div class="node" id="node-zhangzhou" onclick="openModal('漳州英歌', '抗战期间（约1942年）由普宁县艺人迁移带入福建漳州，与闽南当地民间艺术交流融合，生根发芽，形成了自己独特的风貌。')">
+                    <div class="pin"></div><div class="node-label">漳州</div>
+                </div>
+            </div>
+            <p style="text-align:center; font-size:1rem; color:var(--primary-color); margin-top:20px; font-weight: bold; letter-spacing: 1px;">
+                🖱️ 点击古画卷轴上的水墨阵眼，探索各流派非遗之英姿
+            </p >
+        </div>
+
+        <div id="media" class="content-section">
+            <h2 style="color:var(--primary-color); text-align:center;">英歌非遗·巨幕观影厅</h2>
+            <p style="text-align:center; font-size: 0.95rem; color: #666; margin-top:-10px;">（已成功对接数字安全流，点击视频中央 ▶ 即可沉浸式高清放映）</p >
+            
+            <div class="video-grid">
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 壹</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=1952677106&bvid=BV1cC411j7G2&cid=1495218120&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 贰</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=115469289916096&bvid=BV1vz1gBiEx7&cid=33567278015&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 叁</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=950562855&bvid=BV1ts4y1V7rZ&cid=1041695183&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 肆</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=1000915520&bvid=BV1ex4y1k73e&cid=1448435991&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 伍</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=116112964519829&bvid=BV1NTfFBRErE&cid=36207265138&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 陆</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=236481849&bvid=BV1Fe411Z7PC&cid=1346220112&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 柒</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=113912515138331&bvid=BV1afFMevEf4&cid=28143388119&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 捌</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=206395782&bvid=BV1Th411h7v8&cid=363815649&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+                <div class="media-card" style="padding: 10px;">
+                    <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 玖</div>
+                    <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=1000496955&bvid=BV11x4y1176g&cid=1432851438&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
+                </div>
+            </div>
+        </div>
+
+<div id="props" class="content-section" style="padding:0; border:none; background:transparent; box-shadow:none;">
+            <div class="epic-dark-section">
+                
+                <div class="epic-carousel">
+                    
+                    <div class="digital-art-container">
+                        <svg viewBox="0 0 200 200" width="100%" height="100%" style="background:#161d26; border-radius:8px;">
+                            <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#3a2512" stop-opacity="1"/>
+                                <stop offset="100%" stop-color="#080d13" stop-opacity="1"/>
+                            </radialGradient>
+                            <rect width="100%" height="100%" fill="url(#goldGlow)"/>
+                            <circle cx="100" cy="95" r="50" fill="none" stroke="#d8b068" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+                            <path d="M100,35 L100,155 M40,95 L160,95" stroke="#d8b068" stroke-width="0.5" opacity="0.2"/>
+                            <path d="M70,80 Q85,70 95,85 M130,80 Q115,70 105,85" stroke="#c62828" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <path d="M75,115 Q100,135 125,115" stroke="#eceff1" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <path d="M100,85 L100,105" stroke="#37474f" stroke-width="4" stroke-linecap="round"/>
+                            <text x="100" y="165" fill="#d8b068" font-family="serif" font-size="11" text-anchor="middle" letter-spacing="3" opacity="0.8">【 英歌脸谱 · 概念图鉴 】</text>
+                        </svg>
+                    </div>
+
+                    <div class="digital-art-container">
+                        <svg viewBox="0 0 200 200" width="100%" height="100%" style="background:#121820; border-radius:8px;">
+                            <rect width="100%" height="100%" fill="#0a0f15"/>
+                            <line x1="50" y1="50" x2="150" y2="150" stroke="#d8b068" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+                            <line x1="50" y1="50" x2="150" y2="150" stroke="#b71c1c" stroke-width="8" stroke-linecap="round" stroke-dasharray="15 10" opacity="0.9"/>
+                            
+                            <line x1="150" y1="50" x2="50" y2="150" stroke="#d8b068" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+                            <line x1="150" y1="50" x2="50" y2="150" stroke="#212121" stroke-width="8" stroke-linecap="round" stroke-dasharray="15 10" opacity="0.9"/>
+                            <ellipse cx="100" cy="100" rx="25" ry="32" fill="none" stroke="#d8b068" stroke-width="2" opacity="0.5"/>
+                            <text x="100" y="170" fill="#d8b068" font-family="serif" font-size="11" text-anchor="middle" letter-spacing="3" opacity="0.8">【 核心道具 · 阵鼓武服 】</text>
+                        </svg>
+                    </div>
+
+                </div>
+
+                <div class="epic-content">
+                    <div class="epic-watermark">04</div>
+                    <div class="epic-title">道具与妆造</div>
+
+                    <div class="epic-card">
+                        <h3>服饰道具</h3>
+                        <p>
+                            舞者头扎英雄巾、身穿刺绣短打武服、腰系彩绸、脚蹬虎头靴，整体利落有气场；核心道具<strong style="color:#d8b068;">英歌槌</strong>（木制短槌）通过挥槌、叩击、翻转等铿锵动作，与鼓声、脚步声交织成富有节奏感的民俗乐章。此外，伴奏乐器（大鼓、钹仔、苏锣、螺号等）、角色头饰（盔头与脸谱），以及布蛇、队旗等特殊道具，进一步强化了表演的叙事性与战斗气势。
+                        </p >
+                    </div>
+
+                    <div class="epic-card">
+                        <h3>脸谱妆容</h3>
+                        <p>
+                            英歌舞脸谱源自古代傩舞面具，以白打底，用红、黑、绿、金等色彩大胆勾勒，线条凌厉、极具张力。主要分为描绘具体人物的“细面”和造型狰狞的“鬼面”。一眼便能读懂英雄本色，尽显“扬正压邪”的文化内涵。<br>
+                        </p >
+                        <div class="epic-tags">
+                            <span class="e-tag" style="background: linear-gradient(135deg, #c62828, #b71c1c);">红：忠勇 (关胜/宋江)</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #37474f, #212121);">黑：刚直 (李逵)</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #eceff1, #b0bec5); color:#212121; text-shadow:none;">白：机敏 (时迁)</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #6a1b9a, #4a148c);">紫：智慧 (公孙胜)</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #ec407a, #c2185b);">粉：果敢 (顾大嫂)</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="course" class="content-section">
+            <h2 style="color:var(--primary-color); text-align:center; margin-bottom: 25px;">《岭南舞蹈赏析与实践》</h2>
+            <p style="text-align:center; color: var(--accent-color); font-weight:bold; margin-top:-15px; margin-bottom: 25px;">通识课核心教学内容与传承意义</p >
+            <ul>
+                <li><strong>【理论赏析模块】</strong> 解析慢板、中板、快板英歌的节奏板式差异。慢板打法单纯古朴，中板节奏较快无舞蛇脸谱，快板讲究快击快收。了解“大站马”、蜈蚣步等非遗基础动律。</li>
+                <li><strong>【器物妆造模块】</strong> 认识传统英歌槌（通常长40cm~60cm不等），赏析时迁、李逵、孙二娘等角色的特定戏剧面部脸谱与紧身短打武士服、好汉姓名腰牌。</li>
+                <li><strong>【动作实践模块】</strong><br>
+                    <span style="display:inline-block; margin-left:15px; margin-top:5px;">1. 槌花基本功：双短棒叩击的握法、寸劲与手部发力。</span><br>
+                    <span style="display:inline-block; margin-left:15px;">2. 阵型走位变化：现场组队，切身体验“双龙出海”、“麦穗花”等经典列阵。</span><br>
+                    <span style="display:inline-block; margin-left:15px;">3. 协同鼓点演练：配合“咚咚咚，隆咚咚”的传统锣鼓大点，进行快击快收对抗训练。</span>
+                </li>
+            </ul>
+        </div>
+
+        <div id="team" class="content-section">
+            <h2 style="color:var(--primary-color); text-align:center; margin-bottom: 25px;">项目图鉴与制作团队</h2>
+            <div class="team-card">
+                <h3 style="color: var(--accent-color); margin-top: 0; font-size: 1.4rem; text-align: center;">负责人：吴秋媚（经管学院）</h3>
+                <p style="text-align: center; color: #666; font-size: 0.95rem; margin-bottom: 20px; font-weight: bold;">—— 岭南非遗文化传承与数字化展示项目 ——</p >
+                <ul style="line-height: 1.9;">
+                    <li><strong>📜 历史源流考究（蓝子仙）：</strong> 负责英歌舞历史渊源考证、多平台学术论点归纳及地域流派特点的核心文本内容收集。</li>
+                    <li><strong>🎥 视听与课程策划（高钦淑）：</strong> 精选高质量数字化影像嵌入资源，提炼通识课核心件纲要，深化非遗保护的当代教学意义。</li>
+                    <li><strong>💻 网页技术实现（吴秋媚）：</strong> 负责本套“英歌舞交互探索古卷”静态网页的全盘架构搭建、移动端深度适配与多媒体底层逻辑调优。</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 class="modal-title" id="modalTitle">流派名称</h2>
+            <p id="modalDesc" style="font-size: 1.1rem; line-height: 1.6; color: var(--text-color);"></p >
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(sec => {
+                sec.classList.remove('active-section');
+                sec.style.animation = 'none';
+            });
+            
+            const activeSec = document.getElementById(tabId);
+            activeSec.classList.add('active-section');
+            void activeSec.offsetWidth; 
+            activeSec.style.animation = 'fadeIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards';
+        }
+
+        const modal = document.getElementById("infoModal");
+        function openModal(title, desc) {
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalDesc").innerText = desc;
+            modal.style.display = "flex";
+        }
+        function closeModal() { modal.style.display = "none"; }
+        window.onclick = function(event) { if (event.target == modal) { closeModal(); } }
+
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicBtn');
+        const musicIcon = document.getElementById('musicIcon');
+
+        function toggleMusic() {
+            if (bgm.paused) {
+                bgm.volume = 1.0;
+                let playPromise = bgm.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        musicIcon.innerText = '🎵';
+                        musicBtn.classList.add('rotating');
+                    }).catch(error => {
+                        console.log("Audio play blocked:", error);
+                        alert("因手机浏览器安全机制，请在页面任意处点击一下再点击音乐盒，即可击鼓起舞！");
+                    });
+                }
+            } else {
+                bgm.pause();
+                musicIcon.innerText = '🔇';
+                musicBtn.classList.remove('rotating');
+            }
+        }
+    </script>
+</body>
+</html>
