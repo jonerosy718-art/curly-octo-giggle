@@ -43,7 +43,6 @@
             color: var(--accent-color); font-family: "KaiTi"; font-weight: bold; font-size: 1.1rem;
             line-height: 1.1; padding: 2px; transform: rotate(-8deg); opacity: 0.85;
             box-shadow: inset 0 0 4px rgba(184, 67, 35, 0.4);
-            background-image: url('data:image/svg+xml;utf8,<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg"><filter id="erosion"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter><rect width="100%" height="100%" fill="none" filter="url(%23erosion)"/></svg>');
             filter: url(#seal-erosion);
         }
 
@@ -67,12 +66,11 @@
         .nav-btn.active {
             background: var(--primary-color); color: var(--bg-color); border-color: var(--primary-color); box-shadow: 0 5px 15px rgba(74, 37, 18, 0.3);
         }
-
         .audio-control {
             position: fixed; top: 20px; right: 20px; z-index: 200;
             background: linear-gradient(135deg, #ebd5a9, #d4b886); border: 2px solid var(--primary-color);
             border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: all 0.3s ease; -webkit-tap-highlight-color: transparent;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;
         }
         .audio-control:hover { transform: scale(1.1); }
         .rotating { animation: rotate 5s linear infinite; border-color: var(--accent-color); }
@@ -133,7 +131,8 @@
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .active-section { display: block; }
-.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 25px; margin-top: 25px; }
+
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 25px; margin-top: 25px; }
         .media-card {
             background: #fff; border: 1px solid #dfcba9; border-radius: 12px; padding: 12px; text-align: center;
             display: flex; flex-direction: column; justify-content: space-between; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
@@ -164,7 +163,58 @@
         
         ul { padding-left: 20px; } li { margin-bottom: 12px; } strong { color: var(--accent-color); }
 
-        @media (max-width: 768px) {
+        /* 👑 专属动效样式：暗夜蓝悬浮、发光流光、电影转场 */
+        .epic-dark-section {
+            background: linear-gradient(135deg, #0b111e 0%, #05080f 100%);
+            border-radius: 16px; padding: 60px 40px; margin: 10px 0; position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 50px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(216, 176, 104, 0.2);
+        }
+        .epic-dark-section::before {
+            content: ''; position: absolute; top: -20%; left: -10%; width: 50%; height: 50%;
+            background: radial-gradient(circle, rgba(216, 176, 104, 0.15) 0%, transparent 70%);
+            filter: blur(40px); pointer-events: none;
+        }
+        .epic-carousel {
+            width: 45%; height: 500px; position: relative; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(216, 176, 104, 0.3);
+            border: 2px solid rgba(216, 176, 104, 0.6); z-index: 2; background-color: #111;
+        }
+        .epic-carousel img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;
+            opacity: 0; animation: epic-fade 10s infinite ease-in-out;
+        }
+        .epic-carousel img:nth-child(1) { animation-delay: 0s; }
+        .epic-carousel img:nth-child(2) { animation-delay: 5s; }
+        @keyframes epic-fade {
+            0%, 40% { opacity: 1; transform: scale(1.02); }
+            50%, 90% { opacity: 0; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+        .epic-content { width: 55%; position: relative; z-index: 2; }
+        .epic-watermark {
+            position: absolute; top: -60px; left: -20px; font-size: 110px; font-family: 'Times New Roman', serif; font-weight: 900;
+            color: transparent; -webkit-text-stroke: 2px rgba(216, 176, 104, 0.1); text-shadow: 0 0 30px rgba(216, 176, 104, 0.05); z-index: -1; user-select: none;
+        }
+        .epic-title {
+            font-size: 36px; color: #d8b068; font-family: "Noto Serif SC", serif; letter-spacing: 4px; font-weight: bold;
+            margin-bottom: 30px; text-shadow: 0 0 15px rgba(216, 176, 104, 0.4);
+        }
+        .epic-title::after { content: ''; display: block; width: 80px; height: 3px; background: linear-gradient(90deg, #d8b068, transparent); margin-top: 15px; }
+        .epic-card {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #d8b068; padding: 25px; border-radius: 8px; margin-bottom: 25px; transition: transform 0.3s, background 0.3s;
+        }
+        .epic-card:hover { transform: translateX(10px); background: rgba(255, 255, 255, 0.06); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        .epic-card h3 { color: #e6c887; font-size: 20px; margin-top: 0; margin-bottom: 12px; letter-spacing: 2px; }
+        .epic-card p { color: #b3c2d1; font-size: 15px; line-height: 1.9; margin: 0; text-align: justify; }
+        .epic-tags { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .e-tag { padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: bold; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        @media (max-width: 900px) {
+            .epic-dark-section { flex-direction: column; padding: 30px; }
+            .epic-carousel { width: 100%; height: 350px; }
+            .epic-content { width: 100%; }
+            .epic-watermark { font-size: 80px; top: -40px; }
             h1 { font-size: 2.1rem; letter-spacing: 4px; }
             .nav-btn { padding: 6px 16px; font-size: 0.95rem; }
             .map-wrapper { height: 420px; border-width: 3px; }
@@ -197,7 +247,8 @@
         <div class="nav-buttons">
             <button class="nav-btn" onclick="switchTab('history')">📜 源流考究</button>
             <button class="nav-btn active" onclick="switchTab('map')">🗺️ 派系图录</button>
-            <button class="nav-btn" onclick="switchTab('media')">🎥 影像与图鉴</button>
+            <button class="nav-btn" onclick="switchTab('media')">🎥 影像大赏</button>
+            <button class="nav-btn" onclick="switchTab('props')">🎭 道具妆造</button>
             <button class="nav-btn" onclick="switchTab('course')">🎓 实践通识</button>
             <button class="nav-btn" onclick="switchTab('team')">✍️ 团队落款</button>
         </div>
@@ -230,7 +281,7 @@
                 <div class="node" id="node-jiazi" onclick="openModal('甲子英歌', '流传于汕尾陆丰，被誉为“武当一叶”。完整队列有107个好汉（比梁山108将少1人），由“李逵”“杨志”等领队。步伐沉稳，气势磅礴。')">
                     <div class="pin"></div><div class="node-label">甲子</div>
                 </div>
-                <div class="node" id="node-shenquan" onclick="openModal('神泉英歌', '风格威猛、粗犷。头槌多为李逵或秦明，二槌为关胜或杨志，手舞布蛇的“时迁”充当队伍前导。身穿武士服紧身短打，勾画风格独特的戏剧脸谱。')">
+                <div class="node" id="node-shenquan" onclick="openModal('神泉英歌', '风格威猛、粗犷。头槌多为李逵或秦明，二槌为关胜 or 杨志，手舞布蛇的“时迁”充当队伍前导。身穿武士服紧身短打，勾画风格独特的戏剧脸谱。')">
                     <div class="pin"></div><div class="node-label">神泉</div>
                 </div>
                 <div class="node" id="node-zhangzhou" onclick="openModal('漳州英歌', '抗战期间（约1942年）由普宁县艺人迁移带入福建漳州，与闽南当地民间艺术交流融合，生根发芽，形成了自己独特的风貌。')">
@@ -241,7 +292,8 @@
                 🖱️ 点击古画卷轴上的水墨阵眼，探索各流派非遗之英姿
             </p >
         </div>
-<div id="media" class="content-section">
+
+        <div id="media" class="content-section">
             <h2 style="color:var(--primary-color); text-align:center;">英歌非遗·巨幕观影厅</h2>
             <p style="text-align:center; font-size: 0.95rem; color: #666; margin-top:-10px;">（已成功对接数字安全流，点击视频中央 ▶ 即可沉浸式高清放映）</p >
             
@@ -250,49 +302,73 @@
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 壹</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=1952677106&bvid=BV1cC411j7G2&cid=1495218120&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 贰</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=115469289916096&bvid=BV1vz1gBiEx7&cid=33567278015&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 叁</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=950562855&bvid=BV1ts4y1V7rZ&cid=1041695183&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 肆</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=1000915520&bvid=BV1ex4y1k73e&cid=1448435991&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 伍</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=116112964519829&bvid=BV1NTfFBRErE&cid=36207265138&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 陆</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=236481849&bvid=BV1Fe411Z7PC&cid=1346220112&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 柒</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=113912515138331&bvid=BV1afFMevEf4&cid=28143388119&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 捌</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=206395782&bvid=BV1Th411h7v8&cid=363815649&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
-
                 <div class="media-card" style="padding: 10px;">
                     <div class="media-title" style="margin-bottom: 10px; font-size: 1rem;">非遗英歌舞 · 典藏影像 玖</div>
                     <iframe src="https://player.bilibili.com/player.html?isOutside=true&aid=1000496955&bvid=BV11x4y1176g&cid=1432851438&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%; height:180px; border-radius:8px;"></iframe>
                 </div>
             </div>
         </div>
-<div id="course" class="content-section">
+        <div id="props" class="content-section" style="padding:0; border:none; background:transparent; box-shadow:none;">
+            <div class="epic-dark-section">
+                <div class="epic-carousel">
+                    < img src="fcd6ee7f87379cff3dd0c746f510706f.jpg" alt="英歌舞脸谱图鉴">
+                    < img src="45418002111b08fa63f5fbc5736fd968.jpg" alt="英歌舞道具服饰乐器">
+                </div>
+                <div class="epic-content">
+                    <div class="epic-watermark">04</div>
+                    <div class="epic-title">道具与妆造</div>
+                    <div class="epic-card">
+                        <h3>服饰道具</h3>
+                        <p>
+                            舞者头扎英雄巾、身穿刺绣短打武服、腰系彩绸、脚蹬虎头靴，整体利落有气场；核心道具<strong style="color:#d8b068;">英歌槌</strong>（木制短槌）通过挥槌、叩击、翻转等铿锵动作，与鼓声、脚步声交织成富有节奏感的民俗乐章。此外，伴奏乐器（大鼓、钹仔、苏锣、螺号等）、角色头饰（盔头与脸谱），以及布蛇、队旗等特殊道具，进一步强化了表演的叙事性与战斗气势。
+                        </p >
+                    </div>
+                    <div class="epic-card">
+                        <h3>脸谱妆容</h3>
+                        <p>
+                            英歌舞脸谱源自古代傩舞面具，以白打底，用红、黑、绿、金等色彩大胆勾勒，线条凌厉、极具张力。主要分为描绘具体人物的“细面”和造型狰狞的“鬼面”。颜色传递性格：<strong style="color:#e57373;">红色表忠勇</strong>（如关胜、宋江），<strong>黑色显刚直</strong>（如李逵），<strong style="color:#fff;text-shadow:0 0 5px #000;">白色示机敏</strong>（如时迁），<strong style="color:#b388ff;">丹紫象征智慧</strong>（如公孙胜），<strong style="color:#ff8a80;">粉/赭色代表果敢憨厚</strong>（如顾大嫂）。经典角色中，头槌常为红脸关胜或秦明，二槌多是黑脸李逵，时迁手持长蛇领舞，司鼓者多扮宋江。一眼便能读懂英雄本色，尽显“扬正压邪”的文化内涵。<br>
+                        </p >
+                        <div class="epic-tags">
+                            <span class="e-tag" style="background: linear-gradient(135deg, #d32f2f, #9a0007);">红：忠勇</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #424242, #111);">黑：刚直</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #e0e0e0, #9e9e9e); color:#000;">白：机敏</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #7b1fa2, #4a0072);">紫：智慧</span>
+                            <span class="e-tag" style="background: linear-gradient(135deg, #e57373, #af4448);">粉：果敢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="course" class="content-section">
             <h2 style="color:var(--primary-color); text-align:center; margin-bottom: 25px;">《岭南舞蹈赏析与实践》</h2>
             <p style="text-align:center; color: var(--accent-color); font-weight:bold; margin-top:-15px; margin-bottom: 25px;">通识课核心教学内容与传承意义</p >
             <ul>
